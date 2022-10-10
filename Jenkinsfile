@@ -13,7 +13,7 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
         stage('checkout the code'){
             steps{
                 slackSend channel: 'hello-world', message: 'job started'
-                git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'master'
+                git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'main'
             }
         }
         stage('build the code'){
@@ -21,6 +21,17 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
                 sh 'mvn clean package'
             }
         }
+        stage('Unit Tests - JUnit and Jacoco') {
+      steps {
+        sh "mvn test"
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+          jacoco execPattern: 'target/jacoco.exec'
+        }
+      }
+    }
          stage('Mutation Tests - PIT') {
       steps {
         sh "mvn org.pitest:pitest-maven:mutationCoverage"
