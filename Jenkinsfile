@@ -16,11 +16,12 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
                 git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'main'
             }
         }
-        stage('build the code'){
-            steps{
-                sh 'mvn clean package'
-            }
-        }
+        stage('Build Artifact - Maven') {
+      steps {
+        sh "mvn clean package -DskipTests=true"
+        archive 'target/*.jar'
+      }
+    }
         stage('Unit Tests - JUnit and Jacoco') {
       steps {
         sh "mvn test"
