@@ -13,7 +13,7 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
         stage('checkout the code'){
             steps{
                 slackSend channel: 'hello-world', message: 'job started'
-                git url:'https://github.com/NavnathChaudhari/holder.git', branch: 'main'
+                git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'master'
             }
         }
         stage('build the code'){
