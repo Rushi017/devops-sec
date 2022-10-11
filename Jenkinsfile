@@ -39,15 +39,7 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
         }
       }
     }
-    stage ('Vulnerability Scan - Docker ') {
-              steps {
-                  
-                 parallel   (
-       "Dependency Scan": {
-       	     	sh "mvn dependency-check:check"
-		}
-              }
-    }
+    
         stage("sonar quality check"){
             steps{
                 script{
@@ -63,6 +55,16 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
                 } 
             }
         }
+        stage('Vulnerability Scan - Docker ') {
+      steps {
+        sh "mvn dependency-check:check"
+      }
+      post {
+        always {
+          dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+        }
+      }
+    }
         stage('create docker image'){
             steps{
                 sh '''docker image build -t $JOB_NAME:v1.$BUILD_ID .
