@@ -3,6 +3,9 @@ pipeline{
     environment{
 imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
 }
+    triggers {
+        pollSCM 'H/2 * * * *'
+		}
     tools{
         maven 'maven'
     }
@@ -13,12 +16,11 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
                 git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'master'
             }
         }
-        stage('Build Artifact - Maven') {
-      steps {
-        sh "mvn clean package -DskipTests=true"
-        archive 'target/*.jar'
-      }
-    }
+        stage('build the code'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
         stage('Unit Tests - JUnit and Jacoco') {
       steps {
         sh "mvn test"
@@ -44,7 +46,7 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
             steps{
                 script{
                     withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
-                            sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/hello-world-cicd/pom.xml"
+                            sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
                       def qg = waitForQualityGate()
