@@ -39,10 +39,19 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
         }
       }
     }
+    stage ('Vulnerability Scan - Docker ') {
+              steps {
+                  
+                 parallel   (
+       "Dependency Scan": {
+       	     	sh "mvn dependency-check:check"
+		}
+              }
+    }
         stage("sonar quality check"){
             steps{
                 script{
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonar-token') {
+                    withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
                             sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
