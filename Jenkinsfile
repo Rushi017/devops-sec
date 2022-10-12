@@ -3,9 +3,6 @@ pipeline{
     environment{
 imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
 }
-    triggers {
-        pollSCM 'H/2 * * * *'
-		}
     tools{
         maven 'maven'
     }
