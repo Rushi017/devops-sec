@@ -3,6 +3,9 @@ pipeline{
     environment{
 imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
 }
+    triggers {
+        pollSCM 'H/2 * * * *'
+		}
     tools{
         maven 'maven'
     }
@@ -22,28 +25,17 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
       steps {
         sh "mvn test"
       }
-      post {
-        always {
-          junit 'target/surefire-reports/*.xml'
-          jacoco execPattern: 'target/jacoco.exec'
-        }
-      }
     }
          stage('Mutation Tests - PIT') {
       steps {
         sh "mvn org.pitest:pitest-maven:mutationCoverage"
-      }
-      post {
-        always {
-          pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
-        }
       }
     }
     
         stage("sonar quality check"){
             steps{
                 script{
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonar-token') {
+                    withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
                             sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
@@ -55,16 +47,16 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
                 } 
             }
         }
-        stage('Vulnerability Scan - Docker ') {
+        stage('Vulnerability Scan - Docker') {
       steps {
-        sh "mvn dependency-check:check"
-      }
-      post {
-        always {
-          dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-        }
-      }
-    }
+        parallel(
+          "Dependency Scan": {
+            sh "mvn dependency-check:check"
+          },
+          "Trivy Scan": {
+            sh "bash trivy-docker-image-scan.sh"
+          }
+        )
         stage('create docker image'){
             steps{
                 sh '''docker image build -t $JOB_NAME:v1.$BUILD_ID .
@@ -94,7 +86,10 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
     }
         post{
         always{
-            echo "========always========"
+          junit 'target/surefire-reports/*.xml'
+          jacoco execPattern: 'target/jacoco.exec'
+          pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
+          dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
         }
         success{
             echo "========pipeline executed successfully ========"
