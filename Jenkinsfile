@@ -57,6 +57,8 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
             sh "bash trivy-docker-image-scan.sh"
           }
         )
+      }
+	}
         stage('create docker image'){
             steps{
                 sh '''docker image build -t $JOB_NAME:v1.$BUILD_ID .
