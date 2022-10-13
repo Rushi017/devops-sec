@@ -113,7 +113,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
           sh "bash integration-test.sh"
         }
        } catch (e) {
-        withKubeConfig([credentialsId: 'kubeconfig']) {
+        withKubeConfig([credentialsId: 'KUBERNETES_CLUSTER_CONFIG']) {
           sh "kubectl -n default rollout undo deploy ${deploymentName}"
         }
         throw e
