@@ -6,7 +6,7 @@ pipeline{
       containerName = "devsecops-container"
       serviceName = "devsecops-svc"
       applicationURL="192.168.184.163"
-      applicationURI="/increment/99
+      applicationURI="/increment/99"
 }
     tools{
         maven 'maven'
