@@ -105,23 +105,23 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
                 sh 'kubectl apply -f deployment.yaml'
         }
         }
+        stage('Integration Tests - DEV') {
+    steps {
+    script {
+     try {
+       withKubeConfig([credentialsId: 'kubeconfig']) {
+          sh "bash integration-test.sh"
+        }
+       } catch (e) {
+        withKubeConfig([credentialsId: 'kubeconfig']) {
+          sh "kubectl -n default rollout undo deploy ${deploymentName}"
+        }
+        throw e
+      }
     }
-        stage("Integration Tests DEV") {
-          steps{
-            script{
-              try{
-                withKubeConfig([credentialsId: 'kubeconfig']) {
-               sh "bash integration-test.sh"
-             }
-             } catch (e) {
-             withKubeConfig([credentialsId: 'kubeconfig']) {
-               sh "kubectl -n default rollout undo deploy ${deploymentName}"
-             }
-             throw e
-             }
-              }
-            }
-          }
+  }
+}
+}
          
         post{
         always{
