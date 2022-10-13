@@ -1,7 +1,12 @@
 pipeline{
     agent any
     environment{
-imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
+      imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
+      deploymentName = "devsecops"
+      containerName = "devsecops-container"
+      serviceName = "devsecops-svc"
+      applicationURL="192.168.184.163"
+      applicationURI="/increment/99
 }
     tools{
         maven 'maven'
@@ -32,7 +37,7 @@ imageName = "nava9594/$JOB_NAME:v1.$BUILD_ID"
         stage("sonar quality check"){
             steps{
                 script{
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonar-token') {
+                    withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
                             sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
@@ -101,6 +106,22 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
         }
         }
     }
+        stage('Integration Tests - DEV') {
+          steps {
+            script {
+              try {
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                  sh "bash integration-test.sh"
+                }
+              } catch (e) {
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                  sh "kubectl -n default rollout undo deploy ${deploymentName}"
+                }
+                throw e
+              }
+            }
+          }
+        }
         post{
         always{
           junit 'target/surefire-reports/*.xml'
