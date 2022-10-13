@@ -106,7 +106,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
         }
         }
     }
-        stage('Integration Tests - DEV') {
+        stage('Integration Tests - DEV'){
        steps {
          script {
            try {
