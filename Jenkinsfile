@@ -37,7 +37,7 @@ pipeline{
         stage("sonar quality check"){
             steps{
                 script{
-                    withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonar-token') {
                             sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
