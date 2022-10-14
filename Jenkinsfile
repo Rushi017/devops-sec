@@ -37,7 +37,7 @@ pipeline{
         stage("sonar quality check"){
             steps{
                 script{
-                    withSonarQubeEnv(credentialsId: 'jenkins-sonar-token') {
+                    withSonarQubeEnv(installationName: 'sonar-scanner', credentialsId: 'jenkins-sonar-token') {
                             sh "mvn sonar:sonar -f /var/lib/jenkins/workspace/spring-boot-pipeline/pom.xml"
                     }
                     timeout(time: 1, unit: 'HOURS') {
@@ -101,19 +101,19 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
     }
         stage('Deploy application on k8s'){
             steps{
-                sh 'sed -i "s#replace#${imageName}#g" k8s_deployment_service.yaml'
-                sh 'kubectl apply -f k8s_deployment_service.yaml'
+                sh 'sed -i "s#replace#${imageName}#g" deployment.yaml'
+                sh 'kubectl apply -f deployment.yaml'
         }
         }
         stage('Integration Tests - DEV') {
     steps {
     script {
      try {
-       withKubeConfig([credentialsId: 'kubeconfig-2']) {
+       withKubeConfig([credentialsId: 'kubeconfig']) {
           sh "bash integration-test.sh"
         }
        } catch (e) {
-        withKubeConfig([credentialsId: 'kubeconfig-2']) {
+        withKubeConfig([credentialsId: 'kubeconfig']) {
           sh "kubectl -n default rollout undo deploy ${deploymentName}"
         }
         throw e
@@ -121,6 +121,13 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
     }
   }
 }
+stage('OWASP ZAP - DAST') {
+       steps {
+         withKubeConfig([credentialsId: 'kubeconfig']) {
+           sh 'bash zap.sh'
+        }
+       }
+   }
 }
          
         post{
@@ -129,6 +136,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
           jacoco execPattern: 'target/jacoco.exec'
           pitmutation mutationStatsFile: '**/target/pit-reports/**/mutations.xml'
           dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+          publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report'])
         }
         success{
             echo "========pipeline executed successfully ========"
