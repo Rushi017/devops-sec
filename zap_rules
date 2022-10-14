@@ -3,6 +3,8 @@
 # Active scan rules set to IGNORE will not be run which will speed up the scan
 # Only the rule identifiers are used - the names are just for info
 # You can add your own messages to each rule by appending them after a tab on each line.
-100001	IGNORE	http://192.168.184.163:30000/
+100001  IGNORE	http://192.168.184.163:30000/
 100000	IGNORE	http://192.168.184.163:30000/
+10023   IGNORE	http://192.168.184.163:30000/
+90022   IGNORE	http://192.168.184.163:30000/
 
