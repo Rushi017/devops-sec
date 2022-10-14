@@ -123,7 +123,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
 }
 stage('OWASP ZAP - DAST') {
        steps {
-         withKubeConfig([credentialsId: 'kubeconfig']) {
+         withKubeConfig([credentialsId: 'kubeconfig-2']) {
            sh 'bash zap.sh'
         }
        }
