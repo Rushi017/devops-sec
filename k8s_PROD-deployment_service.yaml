@@ -48,6 +48,7 @@ spec:
   - port: 8080
     protocol: TCP
     targetPort: 8080
+    nodePort: 30001
   selector:
     app: devsecops
-  type: ClusterIP
+  type: NodePort
