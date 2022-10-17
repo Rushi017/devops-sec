@@ -34,13 +34,7 @@ spec:
           runAsNonRoot: true
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
-        resources:
-         requests:
-          memory: "50Mi"
-          cpu: "50m"
-         limits:
-          memory: "50Mi"
-          cpu: "50m"
+        
 ---
 apiVersion: v1
 kind: Service
