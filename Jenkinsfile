@@ -106,9 +106,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
              sh "bash k8s-deployment.sh"
           },
            "Rollout Status": {
-             withKubeConfig([credentialsId: 'kubeconfig-2']) {
-               sh "bash k8s-deployment-rollout-status.sh"
-             }
+            sh "bash k8s-deployment-rollout-status.sh"
            }
          )
      }
