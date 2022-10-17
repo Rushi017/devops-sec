@@ -103,12 +103,12 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
        steps {
          parallel(
            "Deployment": {
-             withKubeConfig([credentialsId: 'kubeconfig']) {
+             withKubeConfig([credentialsId: 'kubeconfig-2']) {
                sh "bash k8s-deployment.sh"
             }
           },
            "Rollout Status": {
-             withKubeConfig([credentialsId: 'kubeconfig']) {
+             withKubeConfig([credentialsId: 'kubeconfig-2']) {
                sh "bash k8s-deployment-rollout-status.sh"
              }
            }
@@ -133,7 +133,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
 }
 stage('OWASP ZAP - DAST') {
        steps {
-         withKubeConfig([credentialsId: 'kubeconfig']) {
+         withKubeConfig([credentialsId: 'kubeconfig-2']) {
            sh 'bash zap.sh'
         }
        }
@@ -187,11 +187,11 @@ stage('Prompte to PROD?') {
        steps {
          script {
            try {
-             withKubeConfig([credentialsId: 'kubeconfig']) {
+             withKubeConfig([credentialsId: 'kubeconfig-2']) {
                sh "bash integration-test-PROD.sh"
              }
            } catch (e) {
-             withKubeConfig([credentialsId: 'kubeconfig']) {
+             withKubeConfig([credentialsId: 'kubeconfig-2']) {
                sh "kubectl -n prod rollout undo deploy ${deploymentName}"
              }
             throw e
