@@ -104,7 +104,7 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
          parallel(
            "Deployment": {
             sh "sed -i 's#replace#${imageName}#g' k8s_deployment_service.yaml"
-            sh "kubectl -n prod apply -f k8s_deployment_service.yaml"
+            sh "kubectl apply -f k8s_deployment_service.yaml"
           },
            "Rollout Status": {
             sh "bash k8s-deployment-rollout-status.sh"
