@@ -92,6 +92,8 @@ docker image rmi $JOB_NAME:v1.$BUILD_ID nava9594/$JOB_NAME:v1.$BUILD_ID nava9594
           },
           "Kubesec Scan": {
             sh "bash kubesec-scan.sh"
+             sh "chown -R jenkins:jenkins trivy"
+              sh "chmod -R 777 metadata.json"
           },
          "Trivy Scan": {
            sh "bash trivy-k8s-scan.sh"
