@@ -29,6 +29,9 @@ spec:
           runAsNonRoot: true
           runAsUser: 100
           readOnlyRootFilesystem: true
+      imagePullSecrets:
+        - name: regcred
+        
 ---
 apiVersion: v1
 kind: Service
