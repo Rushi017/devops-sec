@@ -5,7 +5,7 @@ pipeline{
       deploymentName = "devsecops"
       containerName = "devsecops-container"
       serviceName = "devsecops-svc"
-      applicationURL="192.168.184.163"
+      applicationURL="192.168.122.25"
       applicationURI="/increment/99"
 }
     tools{
@@ -15,7 +15,7 @@ pipeline{
         stage('checkout the code'){
             steps{
                 slackSend channel: 'hello-world', message: 'job started'
-                git url:'https://github.com/NavnathChaudhari/devops-sec', branch: 'master'
+                git url:'https://github.com/Rushi017/devops-sec', branch: 'master'
             }
         }
         stage('build the code'){
